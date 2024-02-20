@@ -1,11 +1,13 @@
-import { Module } from '@nestjs/common';
+import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { AccountsModule } from './accounts/accounts.module';
+import { AccountsModule } from './modules/accounts/accounts.module';
 import { AccountEntity } from './database/models/account.entity';
 import { CategoryEntity } from './database/models/category.entity';
 import { CityEntity } from './database/models/city.entity';
 import { AdsEntity } from './database/models/ads.entity';
+import { loggerMiddleware } from './global/middlewares/logger.middleware';
+import { AuthModule } from './modules/auth/auth.module';
 
 
 @Module({
@@ -23,8 +25,13 @@ import { AdsEntity } from './database/models/ads.entity';
       logging: false,
     }),
     AccountsModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
 })
-export class AppModule {}
+export class AppModule implements NestModule {
+  configure(consumer: MiddlewareConsumer) {
+    consumer.apply(loggerMiddleware).forRoutes('*')
+  }
+}
