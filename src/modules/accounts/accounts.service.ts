@@ -10,4 +10,5 @@ export class AccountsService {
     private readonly accountRepository: Repository<AccountEntity>,
   ) {}
 
+  
 }

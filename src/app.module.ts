@@ -8,6 +8,9 @@ import { CityEntity } from './database/models/city.entity';
 import { AdsEntity } from './database/models/ads.entity';
 import { loggerMiddleware } from './global/middlewares/logger.middleware';
 import { AuthModule } from './modules/auth/auth.module';
+import { AdsModule } from './modules/ads/ads.module';
+import { CityModule } from './modules/city/city.module';
+import { CategoryModule } from './modules/category/category.module';
 
 
 @Module({
@@ -26,6 +29,9 @@ import { AuthModule } from './modules/auth/auth.module';
     }),
     AccountsModule,
     AuthModule,
+    AdsModule,
+    CityModule,
+    CategoryModule,
   ],
   controllers: [],
   providers: [],
