@@ -2,10 +2,6 @@ import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AccountsModule } from './modules/accounts/accounts.module';
-import { AccountEntity } from './database/models/account.entity';
-import { CategoryEntity } from './database/models/category.entity';
-import { CityEntity } from './database/models/city.entity';
-import { AdsEntity } from './database/models/ads.entity';
 import { loggerMiddleware } from './global/middlewares/logger.middleware';
 import { AuthModule } from './modules/auth/auth.module';
 import { AdsModule } from './modules/ads/ads.module';
@@ -15,15 +11,15 @@ import { CategoryModule } from './modules/category/category.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot(),
+    ConfigModule.forRoot({ isGlobal: true }),
     TypeOrmModule.forRoot({
       type: 'postgres',
       port: +process.env.DATABASE_PORT,
       host: process.env.DATABASE_HOST,
-      database:process.env.DATABASE_NAME,
+      database: process.env.DATABASE_NAME,
       username: process.env.DATABASE_USERNAME,
       password: process.env.DATABASE_PASSWORD,
-      entities:[AccountEntity,CategoryEntity,CityEntity,AdsEntity],
+      entities: [__dirname + '/database/models/*.entity{.ts,.js}'],
       synchronize: true,
       logging: false,
     }),
@@ -38,6 +34,6 @@ import { CategoryModule } from './modules/category/category.module';
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {
-    consumer.apply(loggerMiddleware).forRoutes('*')
+    consumer.apply(loggerMiddleware).forRoutes('*');
   }
 }

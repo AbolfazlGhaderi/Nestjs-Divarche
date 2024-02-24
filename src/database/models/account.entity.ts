@@ -8,7 +8,7 @@ export class AccountEntity{
     id:number;
 
     @Column({unique:true,nullable:false})
-    mobile_number:number
+    mobile_number:string
 
     @Column({nullable:false})
     isblock: boolean;
