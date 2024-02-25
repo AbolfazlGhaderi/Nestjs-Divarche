@@ -10,5 +10,10 @@ export class AccountsService {
     private readonly accountRepository: Repository<AccountEntity>,
   ) {}
 
+
+  getAllAccounts(){
+    return this.accountRepository.find()
+  }
+
   
 }

@@ -1,33 +1,69 @@
-import { Injectable } from '@nestjs/common';
+import { HttpException, Injectable } from '@nestjs/common';
 import { loginDTO } from './dto/login.dto';
 import { AccountEntity } from 'src/database/models/account.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import sendSMS from 'src/global/helpers/send.sms';
-import  Redis  from 'ioredis';
+import Redis from 'ioredis';
 
 @Injectable()
 export class AuthService {
-    private readonly sendSMS = new sendSMS();
-    private readonly redisClient : Redis
+  private readonly sendSMS = new sendSMS();
+  private readonly redisClient: Redis;
   constructor(
     @InjectRepository(AccountEntity)
     private readonly accountRepository: Repository<AccountEntity>,
   ) {
     this.redisClient = new Redis({
       host: 'localhost',
-      port: 6379
-    })
+      port: 6379,
+    });
   }
 
-
   async login(Data: loginDTO) {
-    if (Data.phoneNumber) {
-      const otpCode = this.sendSMS.sendOtpLogin()
-      const savedToRedis = await this.redisClient.set(Data.phoneNumber, otpCode) 
-      return savedToRedis 
+    
+    if (!Data.code) {
+      const { phoneNumber } = Data;
+      // check otp code
+      await this.redisClient.del(phoneNumber + ':login');
 
+      // create otp code
+      const otpCode = this.sendSMS.sendOtpLogin(phoneNumber);
+
+      //save otp code in redis
+      await this.redisClient.set(
+        Data.phoneNumber + ':login',otpCode,'EX',60,
+      );
+
+      // RETURN
+      return { phoneNumber: phoneNumber };
+
+    } else {
+      const { phoneNumber,code } = Data;
       
+      // find otp code in redis
+      const otpCode = await this.redisClient.get(phoneNumber + ':login');
+
+
+      // check otp code
+      if (!otpCode || otpCode !== code)
+        throw new HttpException('OTP Code not found', 404);
+
+      // delete otp code  
+      await this.redisClient.del(phoneNumber + ':login');
+
+      // find user by phone number
+      const user = await this.accountRepository.findOne({
+        where: { mobile_number: phoneNumber },
+      });
+
+      // save user
+      if (!user) {
+        
+        await this.accountRepository.save({ mobile_number: phoneNumber });
+      }
+
+      return 'success';
     }
   }
 }

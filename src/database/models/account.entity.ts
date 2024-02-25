@@ -10,7 +10,7 @@ export class AccountEntity{
     @Column({unique:true,nullable:false})
     mobile_number:string
 
-    @Column({nullable:false})
+    @Column({nullable:false,default:false})
     isblock: boolean;
 
     @Column({nullable:true})
