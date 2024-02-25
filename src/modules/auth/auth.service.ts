@@ -5,12 +5,14 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import sendSMS from 'src/global/helpers/send.sms';
 import Redis from 'ioredis';
+import { JwtService } from '@nestjs/jwt';
 
 @Injectable()
 export class AuthService {
   private readonly sendSMS = new sendSMS();
   private readonly redisClient: Redis;
   constructor(
+    private readonly jwtService:JwtService,
     @InjectRepository(AccountEntity)
     private readonly accountRepository: Repository<AccountEntity>,
   ) {
@@ -52,18 +54,24 @@ export class AuthService {
       // delete otp code  
       await this.redisClient.del(phoneNumber + ':login');
 
-      // find user by phone number
-      const user = await this.accountRepository.findOne({
+      // find account by phone number
+      let account = await this.accountRepository.findOne({
         where: { mobile_number: phoneNumber },
       });
 
-      // save user
-      if (!user) {
+      
+      // save account
+      if (!account) {
         
-        await this.accountRepository.save({ mobile_number: phoneNumber });
+        account = await this.accountRepository.save({ mobile_number: phoneNumber });
       }
 
-      return 'success';
+      const accessToken = this.jwtService.sign({ sub: account.id })
+
+      return {
+        statusCode: 200,
+        accessToken:accessToken
+      };
     }
   }
 }
