@@ -33,12 +33,14 @@ export class AdsService {
   }
 
   async getAllAdsByCityName(cityName: string) {
-    // get city
+    // find city
     const city = await this.cityService.findCityByName(cityName);
 
-    // get ads by city name
+    // find ads by city name
     const ads = await this.adsRepository.find({ where: { city: city } });
     if (!ads[0]) throw new HttpException('ads not found', 404);
+
+    return ads;
   }
 
   async createAdS(Data: CreateAdDTO, accountId: number) {
@@ -58,6 +60,16 @@ export class AdsService {
     });
     const adSaved = await this.adsRepository.save(newAd);
 
-    return {message:'Create Successfully'};
+    return { message: 'Create Successfully' };
+  }
+
+  async deleteAdS(id: number) {
+    const ad = await this.adsRepository.delete({ id: id });
+
+    if (ad.affected === 0) throw new HttpException('ad not found', 404);
+
+    return {
+      message:'Delete Successfully'
+    }
   }
 }
