@@ -7,6 +7,8 @@ import { AuthModule } from './modules/auth/auth.module';
 import { AdsModule } from './modules/ads/ads.module';
 import { CityModule } from './modules/city/city.module';
 import { CategoryModule } from './modules/category/category.module';
+import { MulterModule } from '@nestjs/platform-express';
+import { UploadeModule } from './modules/upload/upload.module';
 
 
 @Module({
@@ -23,11 +25,15 @@ import { CategoryModule } from './modules/category/category.module';
       synchronize: true,
       logging: false,
     }),
+    MulterModule.register({
+      dest: './uploads',
+    }),
     AccountsModule,
     AuthModule,
     AdsModule,
     CityModule,
     CategoryModule,
+    UploadeModule
   ],
   controllers: [],
   providers: [],
