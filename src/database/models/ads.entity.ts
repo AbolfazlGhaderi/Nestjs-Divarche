@@ -9,7 +9,7 @@ export class AdsEntity{
     @PrimaryGeneratedColumn()
     id :number
 
-    @Column({nullable:false,unique:true})
+    @Column({nullable:false,unique:false})
     title:string;
 
     @Column({nullable:false,type:'text'})
