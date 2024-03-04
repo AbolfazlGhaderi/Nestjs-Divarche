@@ -36,8 +36,9 @@ export class UploadController {
       storage: storageAdsImage,
     }),
   )
-  uploadeAdPhotoC(@UploadedFiles() file: Express.Multer.File) {
-    return this.uploadService.uploadAdPhotoS(file);
+  async uploadeAdPhotoC(@UploadedFiles() file: Express.Multer.File) {
+   
+    return await  this.uploadService.uploadAdPhotoS(file);
   }
 
   // ------------------

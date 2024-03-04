@@ -4,25 +4,20 @@ import { PhotoEntity } from 'src/database/models/photo.entity';
 import { Repository } from 'typeorm';
 
 @Injectable()
-export class UploadService {
+export class PhotoService {
   constructor(
     @InjectRepository(PhotoEntity)
     private readonly photoRepository: Repository<PhotoEntity>,
   ) {}
-  async uploadAdPhotoS(file: Express.Multer.File) {
 
+  async findPhotoByUrl(photo_url: string) {
+      const photo = await this.photoRepository.findOne({
+        where: {
+          photo_url:photo_url
+        }
+      })
 
-    // file empty
-    if (!file[0]) throw new HttpException('photo is empty', 400);
-
-
-    const photo = await this.photoRepository.save({
-      photo_url: file[0].path,
-    });
-
-    // return file path
-    return {
-      filePath: photo.photo_url,
-    };
+      if(!photo) throw new HttpException('photo not found',404)
+      return photo
   }
 }
