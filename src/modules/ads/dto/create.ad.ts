@@ -2,6 +2,7 @@ import { Optional } from '@nestjs/common';
 import { IsNotEmpty, IsNumberString, IsOptional, IsString } from 'class-validator';
 
 export class CreateAdDTO {
+  
   @IsNotEmpty()
   @IsString()
   title: string;
@@ -11,9 +12,8 @@ export class CreateAdDTO {
   description: string;
 
   @IsOptional()
-  @IsNotEmpty()
   @IsString()
-  photo?: string;
+  photourl?: string;
 
   @IsNotEmpty()
   @IsNumberString()
